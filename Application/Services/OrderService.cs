@@ -43,10 +43,19 @@ namespace ECommerceApi.Application.Services
                     existingOrder.TotalAmount += existingOrderItem.UnitPrice;
                     existingProduct.StockQuantity -= 1;
 
-                    await _context.SaveChangesAsync();
-                    response.Status = true;
-                    response.Message = "Added successfully";
-                    return response;
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        response.Status = true;
+                        response.Message = "Added successfully";
+                        return response;
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+
+                        response.Message = "An error occurred, Try again";
+                        return response;
+                    }
                 }
 
                 var newOrderItem = new OrderItem
